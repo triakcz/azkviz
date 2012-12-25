@@ -12,23 +12,24 @@ screen = pygame.display.get_surface()
 MAXTIMER=15
 
 buf=0
+charbuf=""
 
 def writebuf():
     pygame.draw.rect(screen,pygame.Color('black'),(500,140,140,30),0)
-    font = pygame.font.Font(None, 30)
-    if buf==0:
-        pygame.display.flip()
-        return
-    t = font.render(str(buf), 1, pygame.Color('white'))
-    screen.blit(t, (500,140))
-    pygame.display.flip()
+    write_text(500,140,str(buf),flip=True)
 
+def writecharbuf():
+    pygame.draw.rect(screen,pygame.Color('black'),(50,25,180,80),0)
+    if (len(charbuf)>0):
+        write_text(50,25,'ENTER - smazat',size=17)
+        write_text(50,40,str(charbuf),flip=True,size=50)
 
-def writeText(x,y,txt):
-    font = pygame.font.Font(None, 30)
+def write_text(x,y,txt,size=30,flip=False):
+    font = pygame.font.Font(None, size)
     t = font.render(str(txt), 1, pygame.Color('white'))
     screen.blit(t, (x,y))
-    pygame.display.flip()
+    if flip:
+        pygame.display.flip()
 
 def draw_timer():
     print timer
@@ -38,7 +39,7 @@ def draw_timer():
 
 
 def input(events): 
-    global buf,timer
+    global buf,timer,charbuf
     for event in events: 
         print event
         if (event.type == pygame.QUIT): 
@@ -63,6 +64,8 @@ def input(events):
                 draw_timer()
 
             elif event.key == pygame.K_F6 or event.key == pygame.K_F10:
+                charbuf=""
+                writecharbuf()
                 timer=0
                 if buf<0 or buf>28:
                     continue
@@ -83,11 +86,25 @@ def input(events):
                 p=buf-1
                 pole[p] = 0
                 draw_field()
+            elif (event.unicode>='a' and event.unicode<='z') or (event.unicode>='A' and event.unicode<='Z'):
+                if len(charbuf) >= 6:
+                    charbuf=""
+                charbuf+=event.unicode
+                writecharbuf()
+            elif (event.key == pygame.K_RETURN):
+                charbuf="";
+                writecharbuf()
 
 
         elif event.type == pygame.USEREVENT+1:
             if timer>0:
                 timer-=1
+                if timer>2:
+                    tuksnd.play()
+                elif timer==0:
+                    tddmtmsnd.play()
+                else:
+                    tukcinksnd.play()
             print timer
             draw_timer()
 
@@ -101,7 +118,7 @@ def draw_hexagon(x,y,c=pygame.Color('red'),size=10,text=None):
         textpos = t.get_rect(centerx=x,centery=y)
         screen.blit(t, textpos)
 
-def draw_field():    
+def draw_field():
     xs=320
     ys=0
     offset=52
@@ -119,14 +136,27 @@ def draw_field():
                 c=pygame.Color('blue');
             draw_hexagon(x,y,size=7,text=str(fid+1),c=c)
             
-    pygame.display.flip()    
+    pygame.display.flip()
 
 pole=[0]*28
 draw_field()
-draw_hexagon(50,430,pygame.Color('blue'),size=5)
-draw_hexagon(500,430,pygame.Color('orange'),size=5)
+draw_hexagon(50,430,pygame.Color('orange'),size=5)
+write_text(50,430,sys.argv[1])
+write_text(50,470,'F6 - Oznacit',size=17)
+draw_hexagon(500,430,pygame.Color('blue'),size=5)
+write_text(500,430,sys.argv[2])
+write_text(500,470,'F10 - Oznacit',size=17)
+write_text(200,470,'F8 - Opravit',size=17,flip=True)
 
 timer=0
+
+pygame.mixer.init()
+snd=pygame.mixer.Sound('sounds/znelka.wav')
+snd.play()
+
+tuksnd=pygame.mixer.Sound('sounds/tuk.wav')
+tukcinksnd=pygame.mixer.Sound('sounds/cink.wav')
+tddmtmsnd=pygame.mixer.Sound('sounds/ttdmtm.wav')
 
 pygame.time.set_timer(pygame.USEREVENT+1, 1000)
 
