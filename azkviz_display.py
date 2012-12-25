@@ -14,6 +14,9 @@ MAXTIMER=15
 buf=0
 charbuf=""
 
+maxtotaltime=60*15
+totaltime=maxtotaltime
+
 def writebuf():
     pygame.draw.rect(screen,pygame.Color('black'),(500,140,140,30),0)
     write_text(500,140,str(buf),flip=True)
@@ -39,7 +42,7 @@ def draw_timer():
 
 
 def input(events): 
-    global buf,timer,charbuf
+    global buf,timer,charbuf,totaltime
     for event in events: 
         print event
         if (event.type == pygame.QUIT): 
@@ -104,6 +107,13 @@ def input(events):
 
 
         elif event.type == pygame.USEREVENT+1:
+            if totaltime>0:
+                totaltime-=1;
+                displayTotalTime()
+            elif totaltime==0:               
+                totaltime-=1;
+                timeoutsnd.play()              
+
             if timer>0:
                 timer-=1
                 if timer>2:
@@ -114,6 +124,12 @@ def input(events):
                     tukcinksnd.play()
             print timer
             draw_timer()
+
+def displayTotalTime():
+    pygame.draw.rect(screen, pygame.Color('black'),[50,10,520,5] ,0)
+    pygame.draw.rect(screen, pygame.Color('red'),[50,10,(520*totaltime/maxtotaltime),5] ,0)
+    pygame.draw.rect(screen, pygame.Color('red'),[50,10,520,5] ,1)
+    pygame.display.flip()
 
 def draw_hexagon(x,y,c=pygame.Color('red'),size=10,text=None):
     m=size*2
@@ -166,6 +182,7 @@ tukcinksnd=pygame.mixer.Sound('sounds/cink.wav')
 tddmtmsnd=pygame.mixer.Sound('sounds/tddmtm.wav')
 poleoksnd=pygame.mixer.Sound('sounds/poleok.wav')
 znelkasnd=pygame.mixer.Sound('sounds/start_kola.wav')
+timeoutsnd=pygame.mixer.Sound('sounds/timeout.wav')
 
 pygame.time.set_timer(pygame.USEREVENT+1, 1000)
 
