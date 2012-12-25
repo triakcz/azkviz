@@ -5,7 +5,7 @@ import pygame
 import sys
 
 pygame.init()
-window = pygame.display.set_mode((640, 480))
+window = pygame.display.set_mode((640, 480),pygame.FULLSCREEN)
 pygame.display.set_caption('AZ-Kviz user display') 
 screen = pygame.display.get_surface()
 
@@ -60,6 +60,9 @@ def input(events):
                 buf/=10
                 writebuf()
             elif event.key == 32:
+                if timer>0:
+                    timer=-1
+                    continue
                 timer=MAXTIMER
                 draw_timer()
 
@@ -75,6 +78,7 @@ def input(events):
                         pole[p] = 1
                     else:
                         pole[p] = 2
+                    poleoksnd.play()
                     draw_field()
                   
                 buf=0
@@ -86,6 +90,9 @@ def input(events):
                 p=buf-1
                 pole[p] = 0
                 draw_field()
+            elif event.key == pygame.K_F1:
+                znelkasnd.play()
+
             elif (event.unicode>='a' and event.unicode<='z') or (event.unicode>='A' and event.unicode<='Z'):
                 if len(charbuf) >= 6:
                     charbuf=""
@@ -146,7 +153,7 @@ write_text(50,470,'F6 - Oznacit',size=17)
 draw_hexagon(500,430,pygame.Color('blue'),size=5)
 write_text(500,430,sys.argv[2])
 write_text(500,470,'F10 - Oznacit',size=17)
-write_text(200,470,'F8 - Opravit',size=17,flip=True)
+write_text(200,470,'F1 - Znelka                F8 - Opravit',size=17,flip=True)
 
 timer=0
 
@@ -156,7 +163,9 @@ snd.play()
 
 tuksnd=pygame.mixer.Sound('sounds/tuk.wav')
 tukcinksnd=pygame.mixer.Sound('sounds/cink.wav')
-tddmtmsnd=pygame.mixer.Sound('sounds/ttdmtm.wav')
+tddmtmsnd=pygame.mixer.Sound('sounds/tddmtm.wav')
+poleoksnd=pygame.mixer.Sound('sounds/poleok.wav')
+znelkasnd=pygame.mixer.Sound('sounds/start_kola.wav')
 
 pygame.time.set_timer(pygame.USEREVENT+1, 1000)
 
