@@ -186,5 +186,8 @@ timeoutsnd=pygame.mixer.Sound('sounds/timeout.wav')
 
 pygame.time.set_timer(pygame.USEREVENT+1, 1000)
 
+clk=pygame.time.Clock()
+
 while True: 
    input(pygame.event.get())
+   clk.tick(20)
